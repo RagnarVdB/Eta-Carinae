@@ -1,15 +1,7 @@
 #!/usr/bin/env python
 
 # Gebruik:
-# ./run.py mijn_par_bestand.par mijn_mod_usr.t mijn_output_map
-
-
-# workdir instellen
-# mkdir workdir
-# verander WORKDIR in python file
-
-# Script executable:
-# chmod 744 run.py
+# ./run.py par_bestand.par mod_usr.t output_map
 
 
 import re
@@ -20,7 +12,9 @@ from sys import argv
 
 THREADS = 4
 WORKDIR = Path(path.dirname(path.realpath(__file__))) / "workdir"
-# Map waarin AMRVAC runt
+
+if not WORKDIR.exists():
+    WORKDIR.mkdir()
 
 current_dir = Path(getcwd())
 

@@ -258,100 +258,99 @@ varunits=[1,1,1,1]                    # units of variables
 lengthunit=[1,1]                      # length units in 2D experiment
 
 
-#########################
-snapNumbers = range(3)
-parfilename="amrvac_carinae.par"
-filebase="wind_2d_eta_"
-foldername="output2/"
-framerate = 1
-video_file = "out.mp4"
-#########################
+
+def create_video(snapNumbers, parfilename, filebase, foldername, framerate, video_file):
+
+    for snapno in snapNumbers:
+
+        #
+        # File info
+        #
+        # These are the files I checked the procedures with, they should work for your if you used the right 
+        # convert_type in your run
+        #
+        # tips: 
+        # 1) in your run folder create an "output" directory
+        # 2) in the amrvac.par file add output to the base_filename, e.g. base_filename='output/wind_2d_eta_'
+        # 3) I ran the simulation with 
+        #     mpirun -np 16 ./amrvac -i amrvac_carinae.par | tee output/terminaloutput.txt
+        # -i specifies the name of the parameter file to usee
+        # | tee output/your_terminal_output_filename.txt stores the terminal output so that you can collect the unit length info
+
+        # If you store the terminal output and your run prints the unit values then you can load it with this routine.
+        # If not, just comment it out and use the unit numbers above!
+        # This will convert the experiment into SI or CGS units depending on what was in the output file parameters
+        unitfilename=foldername+"terminaloutput.txt"
+        # unitnames, unitvals = getunits(unitfilename)
+        # unitlength=getunit("length",unitfilename)
+        # unitrho=getunit("rho",unitfilename)
+        # unitp=getunit("p",unitfilename)
+        # unitv=getunit("v",unitfilename)
+        # varunits=[unitrho,unitp,unitv,unitv]   # units of variables
+        # lengthunit=[unitlength,unitlength]           # length units in 2D experiment
+
+        varunits=[1,1,1,1]
+        lengthunit=[1,1]
+
+        block_nx1, block_nx2=readparfile(parfilename)
+
+        var, x_corner, y_corner, x_centre, y_centre, numgrid = readvtu(filebase, snapno, block_nx1, block_nx2, namevars, varunits, lengthunit, folder=foldername, fillwidth=4)
+
+        #check some values to see if it has worked
+        np.min(var[:,v2_,:,:])
+        np.max(var[:,v2_,:,:])
+        np.min(var[:,p_,:,:])
+        np.max(var[:,p_,:,:])
+
+        #plotting exaple
+        plotlimsx=(np.min(x_corner),np.max(x_corner))
+        plotlimsy=(np.min(y_corner),np.max(y_corner))
+        textUL=(plotlimsx[0]+0.1*(plotlimsx[1]-plotlimsx[0]), plotlimsy[1]-0.1*(plotlimsy[1]-plotlimsy[0]))
+        textUR=(plotlimsx[0]+0.6*(plotlimsx[1]-plotlimsx[0]), plotlimsy[1]-0.1*(plotlimsy[1]-plotlimsy[0]))
+
+        fig_size=(8.8,8.8)
+        ## if you want to plot multiple subplots in the same figure change the 1,1 inputs to 
+        ## e.g. 3,2 for 3 cols and 2 rows of panels
+        fig, axs = plt.subplots(1,1, constrained_layout=True, figsize=fig_size)
+        ## specify the axes of the subplot if using subplots... don't if you aren't!
+        #ax=axs[1,1]
+        ax=axs
+        varno=rho_
+        myvar="rho"
+        minplot=np.min(var[:,varno,:,:])
+        maxplot=np.max(var[:,varno,:,:])
+        varlabel='N$_H$ (cm$^{-3}$)'
+        findit=np.where( np.array(namevars) == myvar )
+        findit=findit[0]
+        findit=findit[0]
+        # plot data block by block. 
+        for igrid in range(0,numgrid):
+            pcm=ax.pcolormesh(x_corner[igrid,:],y_corner[igrid,:], var[igrid,findit,:,:].transpose(), norm=colors.LogNorm(vmin=minplot,vmax=maxplot), antialiased=False)
+
+        ax.set_xlim(plotlimsx)
+        ax.set_ylim(plotlimsy)
+        cb=fig.colorbar(pcm, ax=ax)
+        cb.set_label(varlabel)
 
 
-for snapno in snapNumbers:
+        fillwidth=4
+        fill='0'
+        snaptempstr=f'{snapno:{fill}{fillwidth}}'
 
-    #
-    # File info
-    #
-    # These are the files I checked the procedures with, they should work for your if you used the right 
-    # convert_type in your run
-    #
-    # tips: 
-    # 1) in your run folder create an "output" directory
-    # 2) in the amrvac.par file add output to the base_filename, e.g. base_filename='output/wind_2d_eta_'
-    # 3) I ran the simulation with 
-    #     mpirun -np 16 ./amrvac -i amrvac_carinae.par | tee output/terminaloutput.txt
-    # -i specifies the name of the parameter file to usee
-    # | tee output/your_terminal_output_filename.txt stores the terminal output so that you can collect the unit length info
+        # Save the figure or show it to screen, I just saved it.
+        # If you save a load of them you can make a video with "ffmpeg" I can show you how.
+        plt.savefig(foldername+filebase+snaptempstr+myvar+".png",dpi=300)
+        #plt.show()
+        plt.close()
 
-    # If you store the terminal output and your run prints the unit values then you can load it with this routine.
-    # If not, just comment it out and use the unit numbers above!
-    # This will convert the experiment into SI or CGS units depending on what was in the output file parameters
-    unitfilename=foldername+"terminaloutput.txt"
-    # unitnames, unitvals = getunits(unitfilename)
-    # unitlength=getunit("length",unitfilename)
-    # unitrho=getunit("rho",unitfilename)
-    # unitp=getunit("p",unitfilename)
-    # unitv=getunit("v",unitfilename)
-    # varunits=[unitrho,unitp,unitv,unitv]   # units of variables
-    # lengthunit=[unitlength,unitlength]           # length units in 2D experiment
+    # Animate
+    run(f"cd {foldername} && ffmpeg -framerate {framerate} -pattern_type glob -i '*.png'   -c:v libx264 -pix_fmt yuv420p {video_file}", shell=True)
 
-    varunits=[1,1,1,1]
-    lengthunit=[1,1]
-
-    block_nx1, block_nx2=readparfile(parfilename)
-
-    var, x_corner, y_corner, x_centre, y_centre, numgrid = readvtu(filebase, snapno, block_nx1, block_nx2, namevars, varunits, lengthunit, folder=foldername, fillwidth=4)
-
-    #check some values to see if it has worked
-    np.min(var[:,v2_,:,:])
-    np.max(var[:,v2_,:,:])
-    np.min(var[:,p_,:,:])
-    np.max(var[:,p_,:,:])
-
-    #plotting exaple
-    plotlimsx=(np.min(x_corner),np.max(x_corner))
-    plotlimsy=(np.min(y_corner),np.max(y_corner))
-    textUL=(plotlimsx[0]+0.1*(plotlimsx[1]-plotlimsx[0]), plotlimsy[1]-0.1*(plotlimsy[1]-plotlimsy[0]))
-    textUR=(plotlimsx[0]+0.6*(plotlimsx[1]-plotlimsx[0]), plotlimsy[1]-0.1*(plotlimsy[1]-plotlimsy[0]))
-
-    fig_size=(8.8,8.8)
-    ## if you want to plot multiple subplots in the same figure change the 1,1 inputs to 
-    ## e.g. 3,2 for 3 cols and 2 rows of panels
-    fig, axs = plt.subplots(1,1, constrained_layout=True, figsize=fig_size)
-    ## specify the axes of the subplot if using subplots... don't if you aren't!
-    #ax=axs[1,1]
-    ax=axs
-    varno=rho_
-    myvar="rho"
-    minplot=np.min(var[:,varno,:,:])
-    maxplot=np.max(var[:,varno,:,:])
-    varlabel='N$_H$ (cm$^{-3}$)'
-    findit=np.where( np.array(namevars) == myvar )
-    findit=findit[0]
-    findit=findit[0]
-    # plot data block by block. 
-    for igrid in range(0,numgrid):
-        pcm=ax.pcolormesh(x_corner[igrid,:],y_corner[igrid,:], var[igrid,findit,:,:].transpose(), norm=colors.LogNorm(vmin=minplot,vmax=maxplot), antialiased=False)
-
-    ax.set_xlim(plotlimsx)
-    ax.set_ylim(plotlimsy)
-    cb=fig.colorbar(pcm, ax=ax)
-    cb.set_label(varlabel)
-
-
-    fillwidth=4
-    fill='0'
-    snaptempstr=f'{snapno:{fill}{fillwidth}}'
-
-    # Save the figure or show it to screen, I just saved it.
-    # If you save a load of them you can make a video with "ffmpeg" I can show you how.
-
-    plt.savefig(foldername+filebase+snaptempstr+myvar+".png",dpi=300)
-    #plt.show()
-    plt.close()
-
-# Animate
-run(f"cd {foldername} && ffmpeg -framerate {framerate} -pattern_type glob -i '*.png'   -c:v libx264 -pix_fmt yuv420p {video_file}", shell=True)
-
-
+if __name__ == "__main__":
+    snapNumbers = [0, 1, 2]
+    parfilename = "amrvac_carinae_double.par"
+    filebase = "wind_2d_eta_"
+    foldername = "output_double"
+    framerate = 1
+    video_file = "out.mp4"
+    create_video(snapNumbers, parfilename, filebase, foldername, framerate, video_file)
