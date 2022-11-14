@@ -44,10 +44,10 @@
         block_nx2=16
         domain_nx1=128
         domain_nx2=128
-        xprobmin1=-4.0d1
+        xprobmin1=0
         xprobmax1=4.0d1
-        xprobmin2=-4.0d1
-        xprobmax2=4.0d1
+        xprobmin2=0
+        xprobmax2=1.0d0
  /
 
  &paramlist
