@@ -23,6 +23,10 @@ arguments = argv[1:]
 if len(arguments) == 3:
     par_file, mod_usr, out_dir = arguments
 
+    x = Path(out_dir)
+    if not x.exists():
+        x.mkdir()
+
     with open(par_file, "r") as f:
         text = f.read()
         regex = r"(?<=base_filename=')(.*)(?=')"

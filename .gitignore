@@ -1,5 +1,8 @@
-workdir
+__pycache__
+.vscode
 *.dat
 *.vtu
 *.log
-.vscode
+*.mp4
+workdir
+output*/
