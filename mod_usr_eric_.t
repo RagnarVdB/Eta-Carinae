@@ -72,7 +72,6 @@ contains
     velbkgrnd=1.00d2*1.d5/unit_velocity ! outer space velocity           =100  km/s, convert cms, then units
 
     ! rho
-    !
     ! rho for correct mass flux
     ! rho = mass flux / (vel * length of border)
     MassPerYear=1.0d-3
