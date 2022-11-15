@@ -259,27 +259,17 @@ lengthunit=[1,1]                      # length units in 2D experiment
 
 
 
-def create_video(snapNumbers, parfilename, filebase, foldername, framerate, video_file):
+def create_video(snapNumbers, parfilename, filebase, foldername, myvar, framerate, video_file):
+
+    match myvar:
+        case "rho":
+            varno=rho_
+        case "p":
+            varno=p_
+        case _:
+            raise Exception(f"{myvar} is geen variabele")
 
     for snapno in snapNumbers:
-
-        #
-        # File info
-        #
-        # These are the files I checked the procedures with, they should work for your if you used the right 
-        # convert_type in your run
-        #
-        # tips: 
-        # 1) in your run folder create an "output" directory
-        # 2) in the amrvac.par file add output to the base_filename, e.g. base_filename='output/wind_2d_eta_'
-        # 3) I ran the simulation with 
-        #     mpirun -np 16 ./amrvac -i amrvac_carinae.par | tee output/terminaloutput.txt
-        # -i specifies the name of the parameter file to usee
-        # | tee output/your_terminal_output_filename.txt stores the terminal output so that you can collect the unit length info
-
-        # If you store the terminal output and your run prints the unit values then you can load it with this routine.
-        # If not, just comment it out and use the unit numbers above!
-        # This will convert the experiment into SI or CGS units depending on what was in the output file parameters
         unitfilename=foldername+"terminaloutput.txt"
         # unitnames, unitvals = getunits(unitfilename)
         # unitlength=getunit("length",unitfilename)
@@ -296,12 +286,6 @@ def create_video(snapNumbers, parfilename, filebase, foldername, framerate, vide
 
         var, x_corner, y_corner, x_centre, y_centre, numgrid = readvtu(filebase, snapno, block_nx1, block_nx2, namevars, varunits, lengthunit, folder=foldername, fillwidth=4)
 
-        #check some values to see if it has worked
-        np.min(var[:,v2_,:,:])
-        np.max(var[:,v2_,:,:])
-        np.min(var[:,p_,:,:])
-        np.max(var[:,p_,:,:])
-
         #plotting exaple
         plotlimsx=(np.min(x_corner),np.max(x_corner))
         plotlimsy=(np.min(y_corner),np.max(y_corner))
@@ -315,10 +299,11 @@ def create_video(snapNumbers, parfilename, filebase, foldername, framerate, vide
         ## specify the axes of the subplot if using subplots... don't if you aren't!
         #ax=axs[1,1]
         ax=axs
-        varno=rho_
-        myvar="rho"
+
+
         minplot=np.min(var[:,varno,:,:])
         maxplot=np.max(var[:,varno,:,:])
+        print("minmax: ", minplot, maxplot)
         varlabel='N$_H$ (cm$^{-3}$)'
         findit=np.where( np.array(namevars) == myvar )
         findit=findit[0]
@@ -353,4 +338,4 @@ if __name__ == "__main__":
     foldername = "output_double"
     framerate = 1
     video_file = "out.mp4"
-    create_video(snapNumbers, parfilename, filebase, foldername, framerate, video_file)
+    create_video(snapNumbers, parfilename, filebase, foldername, "rho", framerate, video_file)

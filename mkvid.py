@@ -8,12 +8,16 @@
 import argparse
 from python_imaging import create_video
 from pathlib import Path
+from os import getcwd
+
+current = Path(getcwd())
 
 parser = argparse.ArgumentParser(description="Maak video van amrvac output")
 parser.add_argument("par_file", type=str, help="parameter file")
-parser.add_argument("output_folder", type=str, help="map met .dat files")
-parser.add_argument("-f", "--framerate", type=int)
-parser.add_argument("-b", "--base", type=str)
+parser.add_argument("output_folder", type=str, help="map met .vtu files")
+parser.add_argument("-v", "--variable", type=str, help="Geplotte variabele 'rho', 'p', 'v1', 'v2' (rho default)")
+parser.add_argument("-f", "--framerate", type=int, help="framerate")
+parser.add_argument("-b", "--base", type=str, help="basenaam vtu bestanden")
 parser.add_argument("output_video", help="bestandsnaam output video", type=str)
 
 args = parser.parse_args()
@@ -23,6 +27,11 @@ assert par_file.exists()
 output_folder = Path(args.output_folder)
 assert output_folder.exists()
 output_video = Path(args.output_video)
+if args.variable is None:
+    variable = "rho"
+else:
+    variable = args.variable
+
 base = args.base
 
 if args.framerate is None:
@@ -52,6 +61,7 @@ create_video(
     str(par_file),
     base,
     str(output_folder) + "/",
+    variable,
     framerate,
-    str(output_video),
+    str(current/output_video),
 )
