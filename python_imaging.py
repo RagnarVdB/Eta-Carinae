@@ -322,7 +322,7 @@ def create_video(frames, parfilename, filebase, foldername, myvar, framerate, vi
         ## specify the axes of the subplot if using subplots... don't if you aren't!
         #ax=axs[1,1]
         ax=axs
-
+        ax.set_box_aspect(1)
 
         varlabel='N$_H$ (cm$^{-3}$)'
         findit=np.where( np.array(namevars) == myvar )
