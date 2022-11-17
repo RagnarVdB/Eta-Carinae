@@ -11,8 +11,11 @@ executable maken:
 
     chmod 744 run.py && chmod 744 mkvid.py
 
+### Help:
+    ./run.py --help
+    ./mkvid.py --help
 ### Running
-    ./run.py par_bestand.par mod_usr_bestand.t output_map
+    ./run.py par_bestand.par mod_usr_bestand.t output_map --purge
 
 of
 ```
