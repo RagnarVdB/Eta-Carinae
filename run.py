@@ -3,7 +3,7 @@
 # Gebruik:
 # ./run.py par_bestand.par mod_usr.t output_map
 
-
+import argparse
 import re
 from os import getcwd, path
 from pathlib import Path
@@ -18,31 +18,32 @@ if not WORKDIR.exists():
 
 current_dir = Path(getcwd())
 
-arguments = argv[1:]
+parser = argparse.ArgumentParser(description="Run MPI-AMRVAC")
+parser.add_argument("par_file", type=str, help="parameter file")
+parser.add_argument("mod_usr", type=str, help="parameter file")
+parser.add_argument("output_dir", type=str, help="map met .vtu files")
+args = parser.parse_args()
 
-if len(arguments) == 3:
-    par_file, mod_usr, out_dir = arguments
 
-    x = Path(out_dir)
-    if not x.exists():
-        x.mkdir()
+par_file, mod_usr, out_dir = args.par_file, args.mod_usr, args.output_dir
 
-    with open(par_file, "r") as f:
-        text = f.read()
-        regex = r"(?<=base_filename=')(.*)(?=')"
-        old = re.findall(regex, text)[0]
-        if "/" in old:
-            folder, base = old.split("/")
-            new = str(current_dir / out_dir / base)
-        else:
-            new = str(current_dir / out_dir / old)
-        new_file = re.sub(regex, new, text)
+x = Path(out_dir)
+if not x.exists():
+    x.mkdir()
 
-    with open(WORKDIR / "par_file.par", "w") as f:
-        f.write(new_file)
+with open(par_file, "r") as f:
+    text = f.read()
+    regex = r"(?<=base_filename=')(.*)(?=')"
+    old = re.findall(regex, text)[0]
+    if "/" in old:
+        folder, base = old.split("/")
+        new = str(current_dir / out_dir / base)
+    else:
+        new = str(current_dir / out_dir / old)
+    new_file = re.sub(regex, new, text)
 
-else:
-    raise ValueError("2 of 3 argumenten verwacht")
+with open(WORKDIR / "par_file.par", "w") as f:
+    f.write(new_file)
 
 
 run(f"cp {mod_usr} {WORKDIR/'mod_usr.t'}", shell=True)
