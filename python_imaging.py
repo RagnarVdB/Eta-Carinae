@@ -19,6 +19,7 @@
 
 def readparfile(parfile):
     import os
+    import sys
     # need to run a convert with type \'vtuCCmpi\' first
     # read par file and get block information
     f = open(parfile, "r")
@@ -259,7 +260,7 @@ lengthunit=[1,1]                      # length units in 2D experiment
 
 
 
-def create_video(snapNumbers, parfilename, filebase, foldername, myvar, framerate, video_file):
+def create_video(frames, parfilename, filebase, foldername, myvar, framerate, video_file):
 
     match myvar:
         case "rho":
@@ -269,22 +270,44 @@ def create_video(snapNumbers, parfilename, filebase, foldername, myvar, framerat
         case _:
             raise Exception(f"{myvar} is geen variabele")
 
-    for snapno in snapNumbers:
-        unitfilename=foldername+"terminaloutput.txt"
-        # unitnames, unitvals = getunits(unitfilename)
-        # unitlength=getunit("length",unitfilename)
-        # unitrho=getunit("rho",unitfilename)
-        # unitp=getunit("p",unitfilename)
-        # unitv=getunit("v",unitfilename)
-        # varunits=[unitrho,unitp,unitv,unitv]   # units of variables
-        # lengthunit=[unitlength,unitlength]           # length units in 2D experiment
+    unitfilename=foldername+"terminaloutput.txt"
+    # unitnames, unitvals = getunits(unitfilename)
+    # unitlength=getunit("length",unitfilename)
+    # unitrho=getunit("rho",unitfilename)
+    # unitp=getunit("p",unitfilename)
+    # unitv=getunit("v",unitfilename)
+    # varunits=[unitrho,unitp,unitv,unitv]   # units of variables
+    # lengthunit=[unitlength,unitlength]           # length units in 2D experiment
 
-        varunits=[1,1,1,1]
-        lengthunit=[1,1]
+    varunits=[1,1,1,1]
+    lengthunit=[1,1]
 
-        block_nx1, block_nx2=readparfile(parfilename)
+    block_nx1, block_nx2=readparfile(parfilename)
 
-        var, x_corner, y_corner, x_centre, y_centre, numgrid = readvtu(filebase, snapno, block_nx1, block_nx2, namevars, varunits, lengthunit, folder=foldername, fillwidth=4)
+    vtus = [
+        readvtu(
+            filebase,
+            frame,
+            block_nx1,
+            block_nx2,
+            namevars,
+            varunits,
+            lengthunit,
+            folder=foldername,
+            fillwidth=4,
+        )
+        for frame in frames
+    ]
+
+    # Bepaal vmin en vmax:
+    minima = [np.min(var[:,varno,:,:]) for var, *_ in vtus]
+    maxima = [np.max(var[:,varno,:,:]) for var, *_ in vtus]
+    vmin = np.min(minima)
+    vmax = np.max(maxima)
+
+
+    for frame, vtu in zip(frames, vtus):
+        var, x_corner, y_corner, x_centre, y_centre, numgrid = vtu
 
         #plotting exaple
         plotlimsx=(np.min(x_corner),np.max(x_corner))
@@ -301,26 +324,30 @@ def create_video(snapNumbers, parfilename, filebase, foldername, myvar, framerat
         ax=axs
 
 
-        minplot=np.min(var[:,varno,:,:])
-        maxplot=np.max(var[:,varno,:,:])
-        print("minmax: ", minplot, maxplot)
         varlabel='N$_H$ (cm$^{-3}$)'
         findit=np.where( np.array(namevars) == myvar )
         findit=findit[0]
         findit=findit[0]
         # plot data block by block. 
-        for igrid in range(0,numgrid):
-            pcm=ax.pcolormesh(x_corner[igrid,:],y_corner[igrid,:], var[igrid,findit,:,:].transpose(), norm=colors.LogNorm(vmin=minplot,vmax=maxplot), antialiased=False)
+        for igrid in range(0, numgrid):
+            pcm = ax.pcolormesh(
+                x_corner[igrid, :],
+                y_corner[igrid, :],
+                var[igrid, findit, :, :].transpose(),
+                norm=colors.LogNorm(vmin=vmin, vmax=vmax),
+                antialiased=False,
+            )
 
-        ax.set_xlim(plotlimsx)
-        ax.set_ylim(plotlimsy)
+
+        ax.set_xlim(*plotlimsx)
+        ax.set_ylim(*plotlimsy)
         cb=fig.colorbar(pcm, ax=ax)
         cb.set_label(varlabel)
 
 
         fillwidth=4
         fill='0'
-        snaptempstr=f'{snapno:{fill}{fillwidth}}'
+        snaptempstr=f'{frame:{fill}{fillwidth}}'
 
         # Save the figure or show it to screen, I just saved it.
         # If you save a load of them you can make a video with "ffmpeg" I can show you how.
