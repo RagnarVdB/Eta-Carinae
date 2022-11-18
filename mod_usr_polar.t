@@ -72,7 +72,6 @@ contains
     velbkgrnd=1.00d2*1.d5/unit_velocity ! outer space velocity           =100  km/s, convert cms, then units
 
     ! rho
-    !
     ! rho for correct mass flux
     ! rho = mass flux / (vel * length of border)
     MassPerYear=1.0d-3
@@ -281,6 +280,27 @@ contains
         w(ixO^S,rho_)=rho0A
         w(ixO^S,e_)=T0A*w(ixO^S,rho_)
     endwhere  
+
+    if (qt .ge. 7.5d-3) then
+      MassPerTime=SolarMass*0.7d0                                           
+      MassPerTime=MassPerTime*unit_time/(unit_mass*365.25*24*60*60)
+      vel0A=4.0d2*1.d5/unit_velocity      ! inner velocity A        =250   km/s, convert cms, then units
+
+      rho0A=MassPerTime/(vel0A*2.d0*PiDouble*rad0)                            ! inner mass density A
+      rhobkgrnd=1.d0*1.67d-24/unit_density  
+      T0A=1.0d5/unit_temperature           ! inner temperature       =10^5 K
+
+      call hd_to_primitive(ixI^L,ixO^L,w,x)
+
+      call hd_to_conserved(ixI^L,ixO^L,w,x)
+
+      where(((x(ixO^S,1)-xc1))<=rad0)
+          w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
+          w(ixO^S,rho_)=rho0A
+          w(ixO^S,e_)=T0A*w(ixO^S,rho_)
+      endwhere  
+
+  endif
 
     ! as set pressure, velocity, convert these to energy and momentum (the code's conserved values)
     call hd_to_conserved(ixI^L,ixO^L,w,x)
