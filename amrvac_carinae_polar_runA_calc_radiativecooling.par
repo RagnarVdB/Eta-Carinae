@@ -25,6 +25,12 @@
         time_stepper='threestep'
         flux_scheme=20*'hll'
         limiter=20*'koren'
+!Add "unphysical" things, but no more small p errors
+	small_density=2000.0
+	small_pressure=2000.0
+	small_temperature=1.5
+	small_values_method='replace'
+	check_small_values=.false.
  /
 !        flux_scheme=20*'hllc'
 
