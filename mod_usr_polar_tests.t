@@ -259,8 +259,8 @@ contains
     
     !Note removed 1.d5 term, which is WRONG
     !As mentioned in the paper
-    v_poles = 8*657.5*1.d5/unit_velocity !Check whether units are correct; should be km/s
-    v_equator = 8*112.5*1.d5/unit_velocity
+    v_poles = 657.5*1.d5/unit_velocity !Check whether units are correct; should be km/s
+    v_equator = 112.5*1.d5/unit_velocity
     lambda = 1.9
 
     delta_t_standard = 40*(365.25*24*60*60)/unit_time !years
