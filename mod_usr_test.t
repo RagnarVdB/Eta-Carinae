@@ -226,7 +226,7 @@ contains
     v_equator = 112.5*1.d5/unit_velocity
     lambda = 1.9
 
-    delta_t_standard = 507*(365.25*24*60*60)/unit_time !years
+    delta_t_standard = 5*(365.25*24*60*60)/unit_time !years
     delta_t_pre = 20*(365.25*24*60*60)/unit_time
     delta_t_exp = 1*(365.25*24*60*60)/unit_time
     delta_t_post_1 = 49*(365.25*24*60*60)/unit_time
