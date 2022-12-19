@@ -358,10 +358,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      call hd_to_primitive(ixI^L,ixO^L,w,x)
-
-      call hd_to_conserved(ixI^L,ixO^L,w,x)
-
       !Add angle dependancy: comment next code
       !where(((x(ixO^S,1)-xc1))<=rad0)
       !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
@@ -402,10 +398,6 @@ contains
       v_poles = 1000*1.d5/unit_velocity
       !Add appropriate lambda (unitless)
       lambda = 1.9
-
-      call hd_to_primitive(ixI^L,ixO^L,w,x)
-
-      call hd_to_conserved(ixI^L,ixO^L,w,x)
 
       !Add angle dependancy: comment next code
       !where(((x(ixO^S,1)-xc1))<=rad0)
@@ -449,10 +441,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      call hd_to_primitive(ixI^L,ixO^L,w,x)
-
-      call hd_to_conserved(ixI^L,ixO^L,w,x)
-
       !Add angle dependancy: comment next code
       !where(((x(ixO^S,1)-xc1))<=rad0)
       !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
@@ -494,10 +482,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      call hd_to_primitive(ixI^L,ixO^L,w,x)
-
-      call hd_to_conserved(ixI^L,ixO^L,w,x)
-
       !Add angle dependancy: comment next code
       !where(((x(ixO^S,1)-xc1))<=rad0)
       !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
@@ -538,10 +522,6 @@ contains
       v_poles = 500*1.d5/unit_velocity
       !Add appropriate lambda (unitless)
       lambda = 1.9
-
-      call hd_to_primitive(ixI^L,ixO^L,w,x)
-
-      call hd_to_conserved(ixI^L,ixO^L,w,x)
 
       !Add angle dependancy: comment next code
       !where(((x(ixO^S,1)-xc1))<=rad0)
