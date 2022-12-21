@@ -56,7 +56,6 @@ contains
 
 
 
-    !Eric's Code
     xc1 = xprobmin1 !The origin should be r=0
     xc2 = xprobmin2 !And theta = 0
 
@@ -277,13 +276,6 @@ contains
     ! * set mass uniform inside
     !     such that this will produce a rate of mass flux rate equal to the desired amount
     ! * set temperature = T0A = 10^5K via pressure, p=T*rho
-    !Eric's Change
-    !where(({^D&(x(ixO^S,^D)-xc^D)**2+})<=rad0**2)
-    !    w(ixO^S,mom(1))=vel0A*({^D&(x(ixO^S,^D)-xc^D)**2+})/(rad0**2)*(x(ixO^S,1)-xc1)/sqrt({^D&(x(ixO^S,^D)-xc^D)**2+})
-    !    w(ixO^S,mom(2))=vel0A*({^D&(x(ixO^S,^D)-xc^D)**2+})/(rad0**2)*(x(ixO^S,2)-xc2)/sqrt({^D&(x(ixO^S,^D)-xc^D)**2+})
-    !    w(ixO^S,rho_)=rho0A
-    !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-    !endwhere  
     where(((x(ixO^S,1)-xc1))<=rad0)
         w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
         w(ixO^S,rho_)=rho0A
@@ -310,17 +302,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 2.4
 
-      !Resetting
-      call hd_to_primitive(ixI^L,ixO^L,w,x)
-
-      call hd_to_conserved(ixI^L,ixO^L,w,x)
-
-      !Add angle dependancy: comment next code
-      !where(((x(ixO^S,1)-xc1))<=rad0)
-      !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
-      !    w(ixO^S,rho_)=rho0A
-      !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-      !endwhere  
 
       !Add angle dependancy
       where(((x(ixO^S,1)-xc1))<=rad0)
@@ -358,12 +339,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      !Add angle dependancy: comment next code
-      !where(((x(ixO^S,1)-xc1))<=rad0)
-      !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
-      !    w(ixO^S,rho_)=rho0A
-      !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-      !endwhere  
 
       !Add angle dependancy
       where(((x(ixO^S,1)-xc1))<=rad0)
@@ -399,12 +374,7 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      !Add angle dependancy: comment next code
-      !where(((x(ixO^S,1)-xc1))<=rad0)
-      !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
-      !    w(ixO^S,rho_)=rho0A
-      !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-      !endwhere  
+
 
       !Add angle dependancy
       where(((x(ixO^S,1)-xc1))<=rad0)
@@ -441,13 +411,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      !Add angle dependancy: comment next code
-      !where(((x(ixO^S,1)-xc1))<=rad0)
-      !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
-      !    w(ixO^S,rho_)=rho0A
-      !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-      !endwhere  
-
       !Add angle dependancy
       where(((x(ixO^S,1)-xc1))<=rad0)
           !Velocity
@@ -482,12 +445,7 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      !Add angle dependancy: comment next code
-      !where(((x(ixO^S,1)-xc1))<=rad0)
-      !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
-      !    w(ixO^S,rho_)=rho0A
-      !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-      !endwhere  
+
 
       !Add angle dependancy
       where(((x(ixO^S,1)-xc1))<=rad0)
@@ -523,12 +481,6 @@ contains
       !Add appropriate lambda (unitless)
       lambda = 1.9
 
-      !Add angle dependancy: comment next code
-      !where(((x(ixO^S,1)-xc1))<=rad0)
-      !    w(ixO^S,mom(1))=vel0A*(x(ixO^S,1)-xc1)/(rad0)
-      !    w(ixO^S,rho_)=rho0A
-      !    w(ixO^S,e_)=T0A*w(ixO^S,rho_)
-      !endwhere  
 
       !Add angle dependancy
       where(((x(ixO^S,1)-xc1))<=rad0)
@@ -575,7 +527,6 @@ contains
     integer, intent(inout) :: refine, coarsen
     logical :: rfgrid
     double precision :: rad0,xc^D ! rad0: radius of location with wind entry, xc1 xc2 are the coords of the centre
-    !Eric's Change
     !Add delta_t's
     double precision :: delta_t_standard, delta_t_pre, delta_t_exp, delta_t_post_1, delta_t_minor_exp, delta_t_post_2
 
